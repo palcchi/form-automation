@@ -4,6 +4,7 @@ const ORIGINAL_FORM = 'https://forms.gle/r3qLz8RUCh4bjHUd8';
 const args = new Set(process.argv.slice(2));
 const countArg = [...args].find((x) => x.startsWith('--count='));
 const startArg = [...args].find((x) => x.startsWith('--start='));
+const SUBMIT = args.has('--submit');
 
 const requestedCount = Number(countArg ? countArg.split('=')[1] : 20) || 20;
 const requestedStart = Number(startArg ? startArg.split('=')[1] : 1) || 1;
@@ -24,13 +25,22 @@ if (!/^https:\/\/(forms\.gle|docs\.google\.com)\//i.test(testFormUrl)) {
   process.exit(1);
 }
 
-if (testFormUrl.trim() === ORIGINAL_FORM) {
-  console.warn('WARNING: using the original form URL. This batch remains DRY RUN only and will NOT press Submit.');
+const isOriginal = testFormUrl.trim() === ORIGINAL_FORM;
+
+if (SUBMIT && isOriginal) {
+  console.error('Refusing bulk submit to the original live evaluation form.');
+  console.error('Use a dedicated QA copy of the form for bulk submission testing.');
+  process.exit(1);
 }
 
+if (isOriginal) {
+  console.warn('WARNING: using the original form URL. This batch is forced to DRY RUN and will NOT press Submit.');
+}
+
+const mode = SUBMIT ? 'SUBMIT TO QA COPY' : 'DRY RUN';
 console.log(`Target form: ${testFormUrl}`);
 console.log(`Profiles: ${start}..${end}`);
-console.log('Mode: DRY RUN only. This script never presses Submit.');
+console.log(`Mode: ${mode}`);
 
 let succeeded = 0;
 let failed = 0;
@@ -38,7 +48,9 @@ const started = Date.now();
 
 for (let i = start; i <= end; i++) {
   console.log(`\n========== QA ${i} (${i - start + 1}/${end - start + 1}) ==========`);
-  const result = spawnSync(process.execPath, ['form.js', '--dry-run'], {
+
+  const childArgs = ['form.js', SUBMIT ? '--submit' : '--dry-run'];
+  const result = spawnSync(process.execPath, childArgs, {
     stdio: 'inherit',
     env: {
       ...process.env,
@@ -57,6 +69,7 @@ for (let i = start; i <= end; i++) {
 const seconds = ((Date.now() - started) / 1000).toFixed(1);
 console.log('\n========== SUMMARY ==========');
 console.log(`Range: ${start}-${end}`);
+console.log(`Mode: ${mode}`);
 console.log(`Succeeded: ${succeeded}`);
 console.log(`Failed: ${failed}`);
 console.log(`Duration: ${seconds}s`);
