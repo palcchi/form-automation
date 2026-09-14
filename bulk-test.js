@@ -3,8 +3,14 @@ import { spawnSync } from 'node:child_process';
 const ORIGINAL_FORM = 'https://forms.gle/r3qLz8RUCh4bjHUd8';
 const args = new Set(process.argv.slice(2));
 const countArg = [...args].find((x) => x.startsWith('--count='));
-const requestedCount = Number(countArg ? countArg.split('=')[1] : 100) || 100;
+const startArg = [...args].find((x) => x.startsWith('--start='));
+
+const requestedCount = Number(countArg ? countArg.split('=')[1] : 20) || 20;
+const requestedStart = Number(startArg ? startArg.split('=')[1] : 1) || 1;
+
 const count = Math.max(1, Math.min(100, requestedCount));
+const start = Math.max(1, Math.min(100, requestedStart));
+const end = Math.min(100, start + count - 1);
 const testFormUrl = process.env.TEST_FORM_URL;
 
 if (!testFormUrl) {
@@ -23,15 +29,15 @@ if (!/^https:\/\/(forms\.gle|docs\.google\.com)\//i.test(testFormUrl)) {
 }
 
 console.log(`Target QA form: ${testFormUrl}`);
-console.log(`Profiles: 1..${count}`);
+console.log(`Profiles: ${start}..${end}`);
 console.log('Mode: DRY RUN only. This script never presses Submit.');
 
 let succeeded = 0;
 let failed = 0;
 const started = Date.now();
 
-for (let i = 1; i <= count; i++) {
-  console.log(`\n========== QA ${i}/${count} ==========`);
+for (let i = start; i <= end; i++) {
+  console.log(`\n========== QA ${i} (${i - start + 1}/${end - start + 1}) ==========`);
   const result = spawnSync(process.execPath, ['form.js', '--dry-run'], {
     stdio: 'inherit',
     env: {
@@ -50,6 +56,7 @@ for (let i = 1; i <= count; i++) {
 
 const seconds = ((Date.now() - started) / 1000).toFixed(1);
 console.log('\n========== SUMMARY ==========');
+console.log(`Range: ${start}-${end}`);
 console.log(`Succeeded: ${succeeded}`);
 console.log(`Failed: ${failed}`);
 console.log(`Duration: ${seconds}s`);
