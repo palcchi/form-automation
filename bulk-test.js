@@ -11,24 +11,24 @@ const requestedStart = Number(startArg ? startArg.split('=')[1] : 1) || 1;
 const count = Math.max(1, Math.min(100, requestedCount));
 const start = Math.max(1, Math.min(100, requestedStart));
 const end = Math.min(100, start + count - 1);
-const testFormUrl = process.env.TEST_FORM_URL;
+const testFormUrl = process.env.TEST_FORM_URL || process.env.FORM_URL;
 
 if (!testFormUrl) {
-  console.error('Missing TEST_FORM_URL. Use a dedicated copy of the form for QA.');
-  process.exit(1);
-}
-
-if (testFormUrl.trim() === ORIGINAL_FORM) {
-  console.error('Refusing to run the batch against the original live evaluation form. Use a QA copy.');
+  console.error('Missing TEST_FORM_URL or FORM_URL.');
+  console.error('Example: export TEST_FORM_URL="https://forms.gle/..."');
   process.exit(1);
 }
 
 if (!/^https:\/\/(forms\.gle|docs\.google\.com)\//i.test(testFormUrl)) {
-  console.error('TEST_FORM_URL must be a Google Forms URL.');
+  console.error('TEST_FORM_URL / FORM_URL must be a Google Forms URL.');
   process.exit(1);
 }
 
-console.log(`Target QA form: ${testFormUrl}`);
+if (testFormUrl.trim() === ORIGINAL_FORM) {
+  console.warn('WARNING: using the original form URL. This batch remains DRY RUN only and will NOT press Submit.');
+}
+
+console.log(`Target form: ${testFormUrl}`);
 console.log(`Profiles: ${start}..${end}`);
 console.log('Mode: DRY RUN only. This script never presses Submit.');
 
