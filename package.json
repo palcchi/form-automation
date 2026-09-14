@@ -7,7 +7,8 @@
     "install:browsers": "playwright install chromium",
     "inspect": "node form.js --inspect",
     "test": "node form.js --dry-run",
-    "submit": "node form.js --submit"
+    "submit": "node form.js --submit",
+    "bulk:test": "node bulk-test.js --count=100"
   },
   "dependencies": {
     "playwright": "^1.55.0"
