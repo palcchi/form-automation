@@ -123,7 +123,6 @@ export function makeQaResponse(index = 1) {
   const types = ['positive', 'balanced', 'mixed', 'balanced', 'positive', 'critical'];
   const profile = types[(safeIndex - 1) % types.length];
   const runId = `TEST-QA-${String(safeIndex).padStart(3, '0')}`;
-
   const scales = Array.from({ length: 26 }, () => weightedScale(rand, profile));
 
   return {
@@ -132,10 +131,10 @@ export function makeQaResponse(index = 1) {
     profile,
     scales,
     essays: [
-      `${runId} | ${cleanEssay(pick(rand, GOOD))}`,
-      `${runId} | ${cleanEssay(pick(rand, IMPROVE))}`,
-      `${runId} | ${cleanEssay(pick(rand, SUGGEST))}`,
-      `${runId} | ${cleanEssay(pick(rand, OTHER))}`
+      cleanEssay(pick(rand, GOOD)),
+      cleanEssay(pick(rand, IMPROVE)),
+      cleanEssay(pick(rand, SUGGEST)),
+      cleanEssay(pick(rand, OTHER))
     ]
   };
 }
