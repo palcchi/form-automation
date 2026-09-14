@@ -103,6 +103,10 @@ function pick(rand, arr) {
   return arr[Math.floor(rand() * arr.length)];
 }
 
+function cleanEssay(text) {
+  return String(text || '').replace(/\./g, '').replace(/\s+/g, ' ').trim();
+}
+
 function weightedScale(rand, profile) {
   const distributions = {
     positive: [3, 4, 4, 4, 5, 5, 5, 5],
@@ -128,10 +132,10 @@ export function makeQaResponse(index = 1) {
     profile,
     scales,
     essays: [
-      `${runId} | ${pick(rand, GOOD)}`,
-      `${runId} | ${pick(rand, IMPROVE)}`,
-      `${runId} | ${pick(rand, SUGGEST)}`,
-      `${runId} | ${pick(rand, OTHER)}`
+      `${runId} | ${cleanEssay(pick(rand, GOOD))}`,
+      `${runId} | ${cleanEssay(pick(rand, IMPROVE))}`,
+      `${runId} | ${cleanEssay(pick(rand, SUGGEST))}`,
+      `${runId} | ${cleanEssay(pick(rand, OTHER))}`
     ]
   };
 }
