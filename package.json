@@ -8,7 +8,7 @@
     "inspect": "node form.js --inspect",
     "test": "node form.js --dry-run",
     "submit": "node form.js --submit",
-    "bulk:test": "node bulk-test.js --count=100"
+    "bulk:test": "node bulk-test.js"
   },
   "dependencies": {
     "playwright": "^1.55.0"
