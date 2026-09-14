@@ -1,0 +1,15 @@
+{
+  "name": "form-automation",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "install:browsers": "playwright install chromium",
+    "inspect": "node form.js --inspect",
+    "test": "node form.js --dry-run",
+    "submit": "node form.js --submit"
+  },
+  "dependencies": {
+    "playwright": "^1.55.0"
+  }
+}
